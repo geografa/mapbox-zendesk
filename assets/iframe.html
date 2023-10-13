@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Simple Address Finder</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/combine/npm/@zendeskgarden/css-bedrock@7.0.21,npm/@zendeskgarden/css-utilities@4.3.0">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+  <script src="https://static.zdassets.com/zendesk_app_framework_sdk/2.0/zaf_sdk.min.js"></script>
+  <!-- Load the `mapbox-gl-geocoder` plugin. -->
+  <script
+    src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+  <link rel="stylesheet"
+    href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
+  <style>
+    #map {
+      top: 12px;
+      height: 300px
+    }
+
+    .mapboxgl-ctrl-top-right .mapboxgl-ctrl {
+      float: right;
+      margin: 10px 17px 0 0;
+    }
+
+    .mapboxgl-ctrl-geocoder,
+    .mapboxgl-ctrl-geocoder .suggestions {
+      border-style: double;
+    }
+
+    a.mapboxgl-ctrl-logo.mapboxgl-compact {
+      width: 75px;
+    }
+
+    #static-map {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      font-size: 16px;
+      border-radius: 5px;
+      position: relative;
+      top: 22px;
+    }
+
+    #static-map:hover {
+      background-color: #3e8e41;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="geocoder"></div>
+  <div id="map" style="display: none;"></div>
+  <button id="static-map" style="display: none;">⬅ Add Map</button>
+  <script>
+    var client = ZAFClient.init();
+    function renderMap() {
+      client.metadata().then(function (metadata) {
+        const settings = metadata.settings;
+        let accessToken = settings.api_token;
+        mapboxgl.accessToken = accessToken;
+        // add geocoder to map
+        const geocoder = new MapboxGeocoder({
+          accessToken: mapboxgl.accessToken
+        });
+        geocoder.addTo('#geocoder');
+        // Add geocoder result to container.
+        geocoder.on('result', (e) => {
+          client.set('comment.text', null)
+          const map = new mapboxgl.Map({
+            container: 'map', // container ID
+            style: 'mapbox://styles/mapbox/streets-v12', // style URL
+            center: [-122.6750, 45.5051], // starting position [lng, lat] portland coordinates 
+            zoom: 9, // starting zoom
+            scrollZoom: false // prevent scroll zoom
+          });
+          // add zoom and rotation controls to the map and position them bottom right
+          map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+          // display the map and center it on the geocoder result
+          map.flyTo({
+            center: e.result.center,
+            zoom: 15
+          });
+          // add a marker to the map
+          const marker = new mapboxgl.Marker()
+            .setLngLat(e.result.center)
+            .addTo(map);
+          document.getElementById('map').style.display = 'block';
+          document.getElementById('static-map').style.display = 'block';
+          document.getElementById('static-map').addEventListener('click', function () {
+            const center = map.getCenter();
+            const centerString = center.lng + ',' + center.lat;
+            const zoom = map.getZoom();
+            let staticMap = `![map](https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-s-embassy+000(${centerString})/${centerString},${zoom}/300x300?access_token=${accessToken})`;
+            client.invoke('ticket.comment.appendMarkdown', staticMap);
+          });
+        });
+      });
+    }
+    // render the map when the app is loaded
+    client.on('app.registered', function () {
+      renderMap();
+      client.invoke('resize', { width: '100%', height: '450px' });
+    });
+  </script>
+</body>
+
+</html>

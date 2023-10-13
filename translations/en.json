@@ -1,0 +1,8 @@
+{
+  "app": {
+    "name": "Simple Address Finder",
+    "short_description": "Find addresses in your help desk.",
+    "long_description": "Use this app to find addresses in your help desk.",
+    "installation_instructions": "Simply click install."
+  }
+}
