@@ -7,7 +7,7 @@ Use the [Mapbox Geocoder](https://docs.mapbox.com/api/search/geocoding/) to find
 ### Usage:
 
 1. Install ZAT or the Zendesk CLI: https://developer.zendesk.com/documentation/apps/zendesk-app-tools-zat/installing-and-using-zat/
-2. Clone this repository
+2. Clone this repository and `cd` into the directory
 3. Run `zat server` to start a local server
 4. Add your Mapbox access token available at https://account.mapbox.com/access-tokens/
 5. Open a ticket in Zendesk and append `?zat=true` to the URL
