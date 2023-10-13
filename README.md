@@ -23,7 +23,7 @@ Use the [Mapbox Geocoder](https://docs.mapbox.com/api/search/geocoding/) to find
 ### Publishing
 When publishing your app, use `zat package` to create a tepmorary zip file. Then, upload the zip file to the Zendesk Marketplace as a private app. Note, you will need to go to the Settings for the app to add your Mapbox access token.
 
-Please submit bug reports to [soundofrafa@gmail.com](mailto:soundofrafa@gmail.com). Pull requests are welcome.
+Pull requests are welcome.
 
 ### Screenshot(s):
 ![settings](./assets/settings.png)
